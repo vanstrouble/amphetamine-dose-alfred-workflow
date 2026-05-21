@@ -6,8 +6,8 @@
 
 # --- Alfred Preferences ---
 readonly TIME_FORMAT=${alfred_time_format:-0} # "0" = 12-hour, "1" = 24-hour
-readonly START_NOTIFICATION=${start_notification:-false}
-readonly END_NOTIFICATION=${end_notification:-false}
+readonly START_NOTIFICATION=${start_notification:-0}
+readonly END_NOTIFICATION=${end_notification:-0}
 readonly DISPLAY_SLEEP_ALLOW=${display_sleep_allow:-false}
 
 # --- Time Calculation Functions ---
@@ -84,12 +84,7 @@ start_timed_session() {
         exit 1
     fi
 
-    local end_notification_script=""
-    if [[ "$END_NOTIFICATION" == "true" ]]; then
-        end_notification_script="; tell application id \"com.runningwithcrayons.Alfred\" to run trigger \\\"session_ended\\\" in workflow \\\"${alfred_workflow_uid}\\\""
-    fi
-
-    osascript -e "tell application \"Amphetamine\" to start new session with options {duration:$total_minutes, interval:minutes, displaySleepAllowed:$allow_display_sleep, onSessionFinishScript:\"${end_notification_script}\"}"
+    osascript -e "tell application \"Amphetamine\" to start new session with options {duration:$total_minutes, interval:minutes, displaySleepAllowed:$allow_display_sleep}"
 }
 
 # --- Main Processing Logic ---
@@ -111,13 +106,8 @@ handle_duration() {
 
 # Handle indefinite session
 handle_indefinite() {
-    local end_notification_script=""
-    if [[ "$END_NOTIFICATION" == "true" ]]; then
-        end_notification_script="; tell application id \"com.runningwithcrayons.Alfred\" to run trigger \\\"session_ended\\\" in workflow \\\"${alfred_workflow_uid}\\\""
-    fi
-
-    osascript -e "tell application \"Amphetamine\" to start new session with options {displaySleepAllowed:$DISPLAY_SLEEP_ALLOW, onSessionFinishScript:\"${end_notification_script}\"}"
-    if [[ "$START_NOTIFICATION" == "true" ]]; then
+    osascript -e "tell application \"Amphetamine\" to start new session with options {displaySleepAllowed:$DISPLAY_SLEEP_ALLOW}"
+    if [[ "$START_NOTIFICATION" == "1" ]]; then
         local suffix=$([[ "$DISPLAY_SLEEP_ALLOW" == "true" ]] && echo " (Display can sleep)" || echo "")
         echo "Keeping awake indefinitely${suffix}"
     fi
@@ -127,7 +117,9 @@ handle_indefinite() {
 handle_deactivation() {
     if osascript -e 'tell application "Amphetamine" to return session is active' >/dev/null 2>&1; then
         osascript -e 'tell application "Amphetamine" to end session'
-        # The end notification is handled by the onSessionFinishScript, so we don't echo here.
+        if [[ "$END_NOTIFICATION" == "1" ]]; then
+            echo "Amphetamine deactivated"
+        fi
     fi
 }
 
