@@ -125,7 +125,7 @@ handle_indefinite() {
 
 # Handle deactivation
 handle_deactivation() {
-    if osascript -e 'tell application "Amphetamine" to return session is active'; then
+    if osascript -e 'tell application "Amphetamine" to return session is active' >/dev/null 2>&1; then
         osascript -e 'tell application "Amphetamine" to end session'
         # The end notification is handled by the onSessionFinishScript, so we don't echo here.
     fi
