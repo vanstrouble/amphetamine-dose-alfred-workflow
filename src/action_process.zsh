@@ -69,7 +69,7 @@ output_message() {
     [[ "$approximate" == "true" ]] && time_text="around $time_text"
     local suffix=$([[ "$allow_display_sleep" == "true" ]] && echo " (Display can sleep)" || echo "")
 
-    if [[ "$START_NOTIFICATION" == "true" ]]; then
+    if [[ "$START_NOTIFICATION" == "1" ]]; then
         echo "Keeping awake until ${time_text}${suffix}"
     fi
 }
