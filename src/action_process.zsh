@@ -124,7 +124,7 @@ handle_deactivation() {
 }
 
 main() {
-    local INPUT="${hotkey_value:-$1}"
+    local INPUT="$1"
 
     [[ -z "$INPUT" || "$INPUT" == "0" ]] && exit 0 # Exit silently for invalid/empty input
 
@@ -138,7 +138,7 @@ main() {
         TIME:*)
             handle_target_time "$INPUT"
             ;;
-        [0-9]*)
+        [1-9]*)
             [[ "$INPUT" =~ ^[0-9]+$ ]] && handle_duration "$INPUT" || {
                 echo "Error: Invalid input format: $INPUT" >&2
                 exit 1
